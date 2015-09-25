@@ -14,22 +14,42 @@ func main() {
 	// Poloniex client
 	poloniex := poloniex.New(API_KEY, API_SECRET)
 
-	tickers, err := poloniex.GetTickers()
-	if err != nil {
-		fmt.Println("Error:", err)
-	} else {
-		for key, ticker := range tickers {
-			fmt.Printf("Ticker: %s, Last: %.8f\n", key, ticker.Last)
+	// Get Ticker (BTC-VTC)
+	/*
+		ticker, err := poloniex.GetTicker("BTC-DRK")
+		fmt.Println(err, ticker)
+	*/
+
+	// Get Tickers
+	/*
+		tickers, err := poloniex.GetTickers()
+		if err != nil {
+			fmt.Println("Error:", err)
+		} else {
+			for key, ticker := range tickers {
+				fmt.Printf("Ticker: %s, Last: %.8f\n", key, ticker.Last)
+			}
 		}
-	}
-	//fmt.Println(err, tickers)
-	tickerName := "BTC_FLO"
-	ticker, ok := tickers[tickerName]
-	if ok {
-		fmt.Printf("BTC_FLO Last: %.8f\n", ticker.Last)
-	} else {
-		fmt.Println("ticker not found - ", tickerName)
-	}
+		tickerName := "BTC_FLO"
+		ticker, ok := tickers[tickerName]
+		if ok {
+			fmt.Printf("BTC_FLO Last: %.8f\n", ticker.Last)
+		} else {
+			fmt.Println("ticker not found - ", tickerName)
+		}
+	*/
+
+	// Get Volumes
+	/*
+		volumes, err := poloniex.GetVolumes()
+		if err != nil {
+			fmt.Println("Error:", err)
+		} else {
+			for key, volume := range volumes.Volumes {
+				fmt.Printf("Ticker: %s Value: %#v\n", key, volume["BTC"])
+			}
+		}
+	*/
 
 	// Get Candle ( OHLCV )
 	/*
@@ -41,12 +61,6 @@ func main() {
 	/*
 		markets, err := poloniex.GetMarkets()
 		fmt.Println(err, markets)
-	*/
-
-	// Get Ticker (BTC-VTC)
-	/*
-		ticker, err := poloniex.GetTicker("BTC-DRK")
-		fmt.Println(err, ticker)
 	*/
 
 	// Get orders book
