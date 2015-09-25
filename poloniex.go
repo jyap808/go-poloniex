@@ -41,3 +41,15 @@ func (b *Poloniex) GetTickers() (tickers map[string]Ticker, err error) {
 	}
 	return
 }
+
+// GetVolumes is used to get the volume for all markets
+func (b *Poloniex) GetVolumes() (vc VolumeCollection, err error) {
+	r, err := b.client.do("GET", "public?command=return24hVolume", "", false)
+	if err != nil {
+		return
+	}
+	if err = json.Unmarshal(r, &vc); err != nil {
+		return
+	}
+	return
+}
