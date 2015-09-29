@@ -26,9 +26,9 @@ func main() {
 	// Poloniex client
 	poloniex := poloniex.New(API_KEY, API_SECRET)
 
-	// Get markets
-	markets, err := poloniex.GetMarkets()
-	fmt.Println(err, markets)
+	// Get tickers
+    tickers, err := poloniex.GetTickers()
+	fmt.Println(err, tickers)
 }
 ~~~	
 
