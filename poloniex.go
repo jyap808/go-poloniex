@@ -4,6 +4,8 @@ package poloniex
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 )
 
 const (
@@ -15,14 +17,6 @@ const (
 func New(apiKey, apiSecret string) *Poloniex {
 	client := NewClient(apiKey, apiSecret)
 	return &Poloniex{client}
-}
-
-// handleErr gets JSON response from Poloniex API en deal with error
-func handleErr(r jsonResponse) error {
-	if !r.Success {
-		return errors.New(r.Message)
-	}
-	return nil
 }
 
 // poloniex represent a poloniex client
@@ -49,6 +43,36 @@ func (b *Poloniex) GetVolumes() (vc VolumeCollection, err error) {
 		return
 	}
 	if err = json.Unmarshal(r, &vc); err != nil {
+		return
+	}
+	return
+}
+
+// GetOrderBook is used to get retrieve the orderbook for a given market
+// market: a string literal for the market (ex: BTC_NXT). 'all' not implemented.
+// cat: bid, ask or both to identify the type of orderbook to return.
+// depth: how deep of an order book to retrieve
+func (b *Poloniex) GetOrderBook(market, cat string, depth int) (orderBook OrderBook, err error) {
+	// not implemented
+	if cat != "bid" && cat != "ask" && cat != "both" {
+		cat = "both"
+	}
+	if depth > 100 {
+		depth = 100
+	}
+	if depth < 1 {
+		depth = 1
+	}
+
+	r, err := b.client.do("GET", fmt.Sprintf("public?command=returnOrderBook&currencyPair=%s&depth=%d", strings.ToUpper(market), depth), "", false)
+	if err != nil {
+		return
+	}
+	if err = json.Unmarshal(r, &orderBook); err != nil {
+		return
+	}
+	if orderBook.Error != "" {
+		err = errors.New(orderBook.Error)
 		return
 	}
 	return
