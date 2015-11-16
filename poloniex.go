@@ -48,6 +48,17 @@ func (b *Poloniex) GetVolumes() (vc VolumeCollection, err error) {
 	return
 }
 
+func (b *Poloniex) GetCurrencies() (currencies Currencies, err error) {
+	r, err := b.client.do("GET", "public?command=returnCurrencies", "", false)
+	if err != nil {
+		return
+	}
+	if err = json.Unmarshal(r, &currencies.Pair); err != nil {
+		return
+	}
+	return
+}
+
 // GetOrderBook is used to get retrieve the orderbook for a given market
 // market: a string literal for the market (ex: BTC_NXT). 'all' not implemented.
 // cat: bid, ask or both to identify the type of orderbook to return.
