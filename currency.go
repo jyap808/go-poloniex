@@ -2,7 +2,7 @@ package poloniex
 
 type Currency struct {
 	Name               string  `json:"name"`
-	MaxDailyWithdrawal float64 `json:"maxDailyWithdrawal,string"`
+	MaxDailyWithdrawal string  `json:"maxDailyWithdrawal"`
 	TxFee              float64 `json:"txFee,string"`
 	MinConf            int     `json:"minConf"`
 	Disabled           int     `json:"disabled"`
