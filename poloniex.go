@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 const (
@@ -86,5 +87,29 @@ func (b *Poloniex) GetOrderBook(market, cat string, depth int) (orderBook OrderB
 		err = errors.New(orderBook.Error)
 		return
 	}
+	return
+}
+
+// Returns candlestick chart data. Required GET parameters are "currencyPair",
+// "period" (candlestick period in seconds; valid values are 300, 900, 1800,
+// 7200, 14400, and 86400), "start", and "end". "Start" and "end" are given in
+// UNIX timestamp format and used to specify the date range for the data
+// returned.
+func (b *Poloniex) ChartData(currencyPair string, period int, start, end time.Time) (candles []*CandleStick, err error) {
+	r, err := b.client.do("GET", fmt.Sprintf(
+		"/public?command=returnChartData&currencyPair=%s&period=%d&start=%d&end=%d",
+		strings.ToUpper(currencyPair),
+		period,
+		start.Unix(),
+		end.Unix(),
+	), "", false)
+	if err != nil {
+		return
+	}
+
+	if err = json.Unmarshal(r, &candles); err != nil {
+		return
+	}
+
 	return
 }
