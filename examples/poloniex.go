@@ -51,10 +51,15 @@ func main() {
 		}
 	*/
 
-	// Get Candle ( OHLCV )
+	// Get CandleStick chart data ( OHLCV )
 	/*
-		markets, err := poloniex.GetHisCandles("BTC-LTC", "hour")
-		fmt.Println(markets, err)
+		candles, err := client.ChartData("BTC_XMR", 300, time.Now().Add(-time.Hour), time.Now())
+		if err != nil {
+			panic(err)
+		}
+		for _, candle := range candles {
+			fmt.Printf("BTC_XMR %s\tOpened at: %f\tClosed at: %f\n", candle.Date, candle.Open, candle.Close)
+		}
 	*/
 
 	// Get markets
