@@ -16,11 +16,17 @@ type client struct {
 	apiKey     string
 	apiSecret  string
 	httpClient *http.Client
+	throttle   <-chan time.Time
 }
+
+var (
+	// Technically 6 req/s allowed, but we're being nice / playing it safe.
+	reqInterval = 200 * time.Millisecond
+)
 
 // NewClient return a new Poloniex HTTP client
 func NewClient(apiKey, apiSecret string) (c *client) {
-	return &client{apiKey, apiSecret, &http.Client{}}
+	return &client{apiKey, apiSecret, &http.Client{}, time.Tick(reqInterval)}
 }
 
 // doTimeoutRequest do a HTTP request with timeout
@@ -44,19 +50,21 @@ func (c *client) doTimeoutRequest(timer *time.Timer, req *http.Request) (*http.R
 	}
 }
 
-// do prepare and process HTTP request to Poloniex API
-func (c *client) do(method string, ressource string, payload string, authNeeded bool) (response []byte, err error) {
+func (c *client) makeReq(method, resource, payload string, authNeeded bool, respCh chan<- []byte, errCh chan<- error) {
+	body := []byte{}
 	connectTimer := time.NewTimer(DEFAULT_HTTPCLIENT_TIMEOUT * time.Second)
 
 	var rawurl string
-	if strings.HasPrefix(ressource, "http") {
-		rawurl = ressource
+	if strings.HasPrefix(resource, "http") {
+		rawurl = resource
 	} else {
-		rawurl = fmt.Sprintf("%s/%s", API_BASE, ressource)
+		rawurl = fmt.Sprintf("%s/%s", API_BASE, resource)
 	}
 
 	req, err := http.NewRequest(method, rawurl, strings.NewReader(payload))
 	if err != nil {
+		respCh <- body
+		errCh <- errors.New("You need to set API Key and API Secret to call this method")
 		return
 	}
 	if method == "POST" || method == "PUT" {
@@ -67,7 +75,8 @@ func (c *client) do(method string, ressource string, payload string, authNeeded 
 	// Auth
 	if authNeeded {
 		if len(c.apiKey) == 0 || len(c.apiSecret) == 0 {
-			err = errors.New("You need to set API Key and API Secret to call this method")
+			respCh <- body
+			errCh <- errors.New("You need to set API Key and API Secret to call this method")
 			return
 		}
 		nonce := time.Now().UnixNano()
@@ -83,17 +92,38 @@ func (c *client) do(method string, ressource string, payload string, authNeeded 
 
 	resp, err := c.doTimeoutRequest(connectTimer, req)
 	if err != nil {
+		respCh <- body
+		errCh <- err
 		return
 	}
 
 	defer resp.Body.Close()
-	response, err = ioutil.ReadAll(resp.Body)
-	//fmt.Println(fmt.Sprintf("reponse %s", response), err)
+
+	body, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return response, err
+		respCh <- body
+		errCh <- err
+		return
 	}
 	if resp.StatusCode != 200 {
-		err = errors.New(resp.Status)
+		respCh <- body
+		errCh <- errors.New(resp.Status)
+		return
 	}
-	return response, err
+
+	respCh <- body
+	errCh <- nil
+	close(respCh)
+	close(errCh)
+}
+
+// do prepare and process HTTP request to Poloniex API
+func (c *client) do(method, resource, payload string, authNeeded bool) (response []byte, err error) {
+	respCh := make(chan []byte)
+	errCh := make(chan error)
+	<-c.throttle
+	go c.makeReq(method, resource, payload, authNeeded, respCh, errCh)
+	response = <-respCh
+	err = <-errCh
+	return
 }
