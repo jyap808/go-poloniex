@@ -29,6 +29,12 @@ func (tc *VolumeCollection) UnmarshalJSON(b []byte) error {
 				return err
 			}
 			tc.TotalBTC = f
+		case "totalETH":
+			f, err := parseJSONFloatString(v)
+			if err != nil {
+				return err
+			}
+			tc.TotalUSDT = f
 		case "totalUSDT":
 			f, err := parseJSONFloatString(v)
 			if err != nil {
