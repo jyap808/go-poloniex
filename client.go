@@ -13,10 +13,11 @@ import (
 )
 
 type client struct {
-	apiKey     string
-	apiSecret  string
-	httpClient *http.Client
-	throttle   <-chan time.Time
+	apiKey      string
+	apiSecret   string
+	httpClient  *http.Client
+	throttle    <-chan time.Time
+	httpTimeout time.Duration
 }
 
 var (
@@ -26,7 +27,12 @@ var (
 
 // NewClient return a new Poloniex HTTP client
 func NewClient(apiKey, apiSecret string) (c *client) {
-	return &client{apiKey, apiSecret, &http.Client{}, time.Tick(reqInterval)}
+	return &client{apiKey, apiSecret, &http.Client{}, time.Tick(reqInterval), 30 * time.Second}
+}
+
+// NewClientWithCustomTimeout returns a new Poloniex HTTP client with custom timeout
+func NewClientWithCustomTimeout(apiKey, apiSecret string, timeout time.Duration) (c *client) {
+	return &client{apiKey, apiSecret, &http.Client{}, time.Tick(reqInterval), timeout}
 }
 
 // doTimeoutRequest do a HTTP request with timeout
@@ -52,7 +58,7 @@ func (c *client) doTimeoutRequest(timer *time.Timer, req *http.Request) (*http.R
 
 func (c *client) makeReq(method, resource, payload string, authNeeded bool, respCh chan<- []byte, errCh chan<- error) {
 	body := []byte{}
-	connectTimer := time.NewTimer(DEFAULT_HTTPCLIENT_TIMEOUT * time.Second)
+	connectTimer := time.NewTimer(c.httpTimeout)
 
 	var rawurl string
 	if strings.HasPrefix(resource, "http") {

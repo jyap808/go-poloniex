@@ -10,13 +10,18 @@ import (
 )
 
 const (
-	API_BASE                   = "https://poloniex.com/" // Poloniex API endpoint
-	DEFAULT_HTTPCLIENT_TIMEOUT = 30                      // HTTP client timeout
+	API_BASE = "https://poloniex.com/" // Poloniex API endpoint
 )
 
-// New return a instantiate poloniex struct
+// New returns an instantiated poloniex struct
 func New(apiKey, apiSecret string) *Poloniex {
 	client := NewClient(apiKey, apiSecret)
+	return &Poloniex{client}
+}
+
+// New returns an instantiated poloniex struct with custom timeout
+func NewWithCustomTimeout(apiKey, apiSecret string, timeout time.Duration) *Poloniex {
+	client := NewClientWithCustomTimeout(apiKey, apiSecret, timeout)
 	return &Poloniex{client}
 }
 
