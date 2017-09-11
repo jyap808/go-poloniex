@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -56,7 +58,7 @@ func (c *client) doTimeoutRequest(timer *time.Timer, req *http.Request) (*http.R
 	}
 }
 
-func (c *client) makeReq(method, resource, payload string, authNeeded bool, respCh chan<- []byte, errCh chan<- error) {
+func (c *client) makeReq(method, resource string, payload map[string]string, authNeeded bool, respCh chan<- []byte, errCh chan<- error) {
 	body := []byte{}
 	connectTimer := time.NewTimer(c.httpTimeout)
 
@@ -67,34 +69,41 @@ func (c *client) makeReq(method, resource, payload string, authNeeded bool, resp
 		rawurl = fmt.Sprintf("%s/%s", API_BASE, resource)
 	}
 
-	req, err := http.NewRequest(method, rawurl, strings.NewReader(payload))
+	formValues := url.Values{}
+	for key, value := range payload {
+		formValues.Set(key, value)
+	}
+	formData := formValues.Encode()
+
+	req, err := http.NewRequest(method, rawurl, strings.NewReader(formData))
 	if err != nil {
 		respCh <- body
 		errCh <- errors.New("You need to set API Key and API Secret to call this method")
 		return
 	}
-	if method == "POST" || method == "PUT" {
-		req.Header.Add("Content-Type", "application/json;charset=utf-8")
-	}
-	req.Header.Add("Accept", "application/json")
 
-	// Auth
 	if authNeeded {
 		if len(c.apiKey) == 0 || len(c.apiSecret) == 0 {
 			respCh <- body
 			errCh <- errors.New("You need to set API Key and API Secret to call this method")
 			return
 		}
-		nonce := time.Now().UnixNano()
-		q := req.URL.Query()
-		q.Set("apikey", c.apiKey)
-		q.Set("nonce", fmt.Sprintf("%d", nonce))
-		req.URL.RawQuery = q.Encode()
+
 		mac := hmac.New(sha512.New, []byte(c.apiSecret))
-		_, err = mac.Write([]byte(req.URL.String()))
+		_, err := mac.Write([]byte(formData))
+		if err != nil {
+			errCh <- err
+		}
 		sig := hex.EncodeToString(mac.Sum(nil))
-		req.Header.Add("apisign", sig)
+		req.Header.Add("Key", c.apiKey)
+		req.Header.Add("Sign", sig)
 	}
+
+	if method == "POST" || method == "PUT" {
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	}
+
+	req.Header.Add("Accept", "application/json")
 
 	resp, err := c.doTimeoutRequest(connectTimer, req)
 	if err != nil {
@@ -124,7 +133,7 @@ func (c *client) makeReq(method, resource, payload string, authNeeded bool, resp
 }
 
 // do prepare and process HTTP request to Poloniex API
-func (c *client) do(method, resource, payload string, authNeeded bool) (response []byte, err error) {
+func (c *client) do(method, resource string, payload map[string]string, authNeeded bool) (response []byte, err error) {
 	respCh := make(chan []byte)
 	errCh := make(chan error)
 	<-c.throttle
@@ -132,4 +141,16 @@ func (c *client) do(method, resource, payload string, authNeeded bool) (response
 	response = <-respCh
 	err = <-errCh
 	return
+}
+
+// doCommand prepares an authorized command-request for Poloniex's tradingApi
+func (c *client) doCommand(command string, payload map[string]string) (response []byte, err error) {
+	if payload == nil {
+		payload = make(map[string]string)
+	}
+
+	payload["command"] = command
+	payload["nonce"] = strconv.FormatInt(time.Now().UnixNano(), 10)
+
+	return c.do("POST", "tradingApi", payload, true)
 }
