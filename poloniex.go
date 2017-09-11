@@ -32,7 +32,7 @@ type Poloniex struct {
 
 // GetTickers is used to get the ticker for all markets
 func (b *Poloniex) GetTickers() (tickers map[string]Ticker, err error) {
-	r, err := b.client.do("GET", "public?command=returnTicker", "", false)
+	r, err := b.client.do("GET", "public?command=returnTicker", nil, false)
 	if err != nil {
 		return
 	}
@@ -44,7 +44,7 @@ func (b *Poloniex) GetTickers() (tickers map[string]Ticker, err error) {
 
 // GetVolumes is used to get the volume for all markets
 func (b *Poloniex) GetVolumes() (vc VolumeCollection, err error) {
-	r, err := b.client.do("GET", "public?command=return24hVolume", "", false)
+	r, err := b.client.do("GET", "public?command=return24hVolume", nil, false)
 	if err != nil {
 		return
 	}
@@ -55,7 +55,7 @@ func (b *Poloniex) GetVolumes() (vc VolumeCollection, err error) {
 }
 
 func (b *Poloniex) GetCurrencies() (currencies Currencies, err error) {
-	r, err := b.client.do("GET", "public?command=returnCurrencies", "", false)
+	r, err := b.client.do("GET", "public?command=returnCurrencies", nil, false)
 	if err != nil {
 		return
 	}
@@ -81,7 +81,7 @@ func (b *Poloniex) GetOrderBook(market, cat string, depth int) (orderBook OrderB
 		depth = 1
 	}
 
-	r, err := b.client.do("GET", fmt.Sprintf("public?command=returnOrderBook&currencyPair=%s&depth=%d", strings.ToUpper(market), depth), "", false)
+	r, err := b.client.do("GET", fmt.Sprintf("public?command=returnOrderBook&currencyPair=%s&depth=%d", strings.ToUpper(market), depth), nil, false)
 	if err != nil {
 		return
 	}
@@ -107,7 +107,7 @@ func (b *Poloniex) ChartData(currencyPair string, period int, start, end time.Ti
 		period,
 		start.Unix(),
 		end.Unix(),
-	), "", false)
+	), nil, false)
 	if err != nil {
 		return
 	}
