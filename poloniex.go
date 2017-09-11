@@ -118,3 +118,17 @@ func (b *Poloniex) ChartData(currencyPair string, period int, start, end time.Ti
 
 	return
 }
+
+func (b *Poloniex) GetBalances() (balances map[string]Balance, err error) {
+	balances = make(map[string]Balance)
+	r, err := b.client.doCommand("returnCompleteBalances", nil)
+	if err != nil {
+		return
+	}
+
+	if err = json.Unmarshal(r, &balances); err != nil {
+		return
+	}
+
+	return
+}
