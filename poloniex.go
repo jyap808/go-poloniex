@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"strconv"
 )
 
 const (
@@ -127,6 +128,20 @@ func (b *Poloniex) GetBalances() (balances map[string]Balance, err error) {
 	}
 
 	if err = json.Unmarshal(r, &balances); err != nil {
+		return
+	}
+
+	return
+}
+
+func (b *Poloniex) GetTradeHistory(pair string, start uint32) (trades map[string][]Trade, err error) {
+	trades = make(map[string][]Trade)
+	r, err := b.client.doCommand("returnTradeHistory", map[string]string{"currencyPair": pair, "start": strconv.FormatUint(uint64(start), 10)})
+	if err != nil {
+		return
+	}
+
+	if err = json.Unmarshal(r, &trades); err != nil {
 		return
 	}
 
