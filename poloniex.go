@@ -31,6 +31,11 @@ type Poloniex struct {
 	client *client
 }
 
+// set enable/disable http request/response dump
+func (c *Poloniex) SetDebug(enable bool) {
+	c.client.debug = enable
+}
+
 // GetTickers is used to get the ticker for all markets
 func (b *Poloniex) GetTickers() (tickers map[string]Ticker, err error) {
 	r, err := b.client.do("GET", "public?command=returnTicker", nil, false)
