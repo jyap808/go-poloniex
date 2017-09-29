@@ -7,7 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strconv"
 	"strings"
@@ -20,6 +22,7 @@ type client struct {
 	httpClient  *http.Client
 	throttle    <-chan time.Time
 	httpTimeout time.Duration
+	debug       bool
 }
 
 var (
@@ -29,12 +32,38 @@ var (
 
 // NewClient return a new Poloniex HTTP client
 func NewClient(apiKey, apiSecret string) (c *client) {
-	return &client{apiKey, apiSecret, &http.Client{}, time.Tick(reqInterval), 30 * time.Second}
+	return &client{apiKey, apiSecret, &http.Client{}, time.Tick(reqInterval), 30 * time.Second, false}
 }
 
 // NewClientWithCustomTimeout returns a new Poloniex HTTP client with custom timeout
 func NewClientWithCustomTimeout(apiKey, apiSecret string, timeout time.Duration) (c *client) {
-	return &client{apiKey, apiSecret, &http.Client{}, time.Tick(reqInterval), timeout}
+	return &client{apiKey, apiSecret, &http.Client{}, time.Tick(reqInterval), timeout, false}
+}
+
+func (c client) dumpRequest(r *http.Request) {
+	if r == nil {
+		log.Print("dumpReq ok: <nil>")
+		return
+	}
+	dump, err := httputil.DumpRequest(r, true)
+	if err != nil {
+		log.Print("dumpReq err:", err)
+	} else {
+		log.Print("dumpReq ok:", string(dump))
+	}
+}
+
+func (c client) dumpResponse(r *http.Response) {
+	if r == nil {
+		log.Print("dumpResponse ok: <nil>")
+		return
+	}
+	dump, err := httputil.DumpResponse(r, true)
+	if err != nil {
+		log.Print("dumpResponse err:", err)
+	} else {
+		log.Print("dumpResponse ok:", string(dump))
+	}
 }
 
 // doTimeoutRequest do a HTTP request with timeout
@@ -46,7 +75,13 @@ func (c *client) doTimeoutRequest(timer *time.Timer, req *http.Request) (*http.R
 	}
 	done := make(chan result, 1)
 	go func() {
+		if c.debug {
+			c.dumpRequest(req)
+		}
 		resp, err := c.httpClient.Do(req)
+		if c.debug {
+			c.dumpResponse(resp)
+		}
 		done <- result{resp, err}
 	}()
 	// Wait for the read or the timeout
