@@ -152,3 +152,23 @@ func (b *Poloniex) GetTradeHistory(pair string, start uint32) (trades map[string
 
 	return
 }
+
+type responseDepositsWithdrawals struct {
+	Deposits    []Deposit    `json:"deposits"`
+	Withdrawals []Withdrawal `json:"withdrawals"`
+}
+
+func (b *Poloniex) GetDepositsWithdrawals(start uint32, end uint32) (deposits []Deposit, withdrawals []Withdrawal, err error) {
+	deposits = make([]Deposit, 0)
+	withdrawals = make([]Withdrawal, 0)
+	r, err := b.client.doCommand("returnDepositsWithdrawals", map[string]string{"start": strconv.FormatUint(uint64(start), 10), "end": strconv.FormatUint(uint64(end), 10)})
+	if err != nil {
+		return
+	}
+	var response responseDepositsWithdrawals
+	if err = json.Unmarshal(r, &response); err != nil {
+		return
+	}
+
+	return response.Deposits, response.Withdrawals, nil
+}
