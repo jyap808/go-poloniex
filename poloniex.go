@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	API_BASE = "https://poloniex.com/" // Poloniex API endpoint
+	API_BASE = "https://poloniex.com" // Poloniex API endpoint
 )
 
 // New returns an instantiated poloniex struct
