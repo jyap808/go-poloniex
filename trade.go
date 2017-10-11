@@ -47,11 +47,11 @@ type ResultingTrade struct {
 	Date    string  `json:"date"`
 	Rate    float64 `json:"rate"`
 	Total   float64 `json:"total"`
-	TradeID int     `json:"tradeID"`
+	TradeID string  `json:"tradeID"`
 	Type    string  `json:"type"`
 }
 
 type TradeOrder struct {
-	OrderNumber     int              `json:"orderNumber"`
+	OrderNumber     string           `json:"orderNumber"`
 	ResultingTrades []ResultingTrade `json:"resultingTrades"`
 }
