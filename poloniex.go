@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
 )
 
 const (
@@ -171,4 +171,42 @@ func (b *Poloniex) GetDepositsWithdrawals(start uint32, end uint32) (deposits []
 	}
 
 	return response.Deposits, response.Withdrawals, nil
+}
+
+func (b *Poloniex) Buy(pair string, rate float64, amount float64, tradeType string) (TradeOrder, error) {
+	reqParams := map[string]string{
+		"currencyPair": pair, "rate": strconv.FormatFloat(rate, 'f', -1, 64),
+		"amount": strconv.FormatFloat(amount, 'f', -1, 64)}
+	if tradeType != "" {
+		reqParams[tradeType] = "1"
+	}
+	r, err := b.client.doCommand("buy", reqParams)
+	if err != nil {
+		return TradeOrder{}, err
+	}
+	var orderResponse TradeOrder
+	if err = json.Unmarshal(r, &orderResponse); err != nil {
+		return TradeOrder{}, err
+	}
+
+	return orderResponse, nil
+}
+
+func (b *Poloniex) Sell(pair string, rate float64, amount float64, tradeType string) (TradeOrder, error) {
+	reqParams := map[string]string{
+		"currencyPair": pair, "rate": strconv.FormatFloat(rate, 'f', -1, 64),
+		"amount": strconv.FormatFloat(amount, 'f', -1, 64)}
+	if tradeType != "" {
+		reqParams[tradeType] = "1"
+	}
+	r, err := b.client.doCommand("sell", reqParams)
+	if err != nil {
+		return TradeOrder{}, err
+	}
+	var orderResponse TradeOrder
+	if err = json.Unmarshal(r, &orderResponse); err != nil {
+		return TradeOrder{}, err
+	}
+
+	return orderResponse, nil
 }

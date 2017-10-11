@@ -1,8 +1,14 @@
 package poloniex
 
 import (
-	"time"
 	"encoding/json"
+	"time"
+)
+
+const (
+	TRADE_FILL_OR_KILL        = "fillOrKill"
+	TRADE_IMMEDIATE_OR_CANCEL = "immediateOrCancel"
+	TRADE_POST_ONLY           = "postOnly"
 )
 
 type Trade struct {
@@ -34,4 +40,18 @@ func (t *Trade) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+type ResultingTrade struct {
+	Amount  float64 `json:"amount"`
+	Date    string  `json:"date"`
+	Rate    float64 `json:"rate"`
+	Total   float64 `json:"total"`
+	TradeID int     `json:"tradeID"`
+	Type    string  `json:"type"`
+}
+
+type TradeOrder struct {
+	OrderNumber     int              `json:"orderNumber"`
+	ResultingTrades []ResultingTrade `json:"resultingTrades"`
 }
