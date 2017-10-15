@@ -1,8 +1,8 @@
 package poloniex
 
 import (
-	"time"
 	"encoding/json"
+	"time"
 )
 
 type Deposit struct {
