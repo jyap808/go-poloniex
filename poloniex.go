@@ -108,7 +108,7 @@ func (b *Poloniex) GetOrderBook(market, cat string, depth int) (orderBook OrderB
 // returned.
 func (b *Poloniex) ChartData(currencyPair string, period int, start, end time.Time) (candles []*CandleStick, err error) {
 	r, err := b.client.do("GET", fmt.Sprintf(
-		"/public?command=returnChartData&currencyPair=%s&period=%d&start=%d&end=%d",
+		"public?command=returnChartData&currencyPair=%s&period=%d&start=%d&end=%d",
 		strings.ToUpper(currencyPair),
 		period,
 		start.Unix(),
