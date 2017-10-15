@@ -1,9 +1,9 @@
 package poloniex
 
 import (
-	"time"
 	"encoding/json"
 	"strings"
+	"time"
 )
 
 type Withdrawal struct {
