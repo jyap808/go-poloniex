@@ -146,8 +146,16 @@ func (b *Poloniex) GetTradeHistory(pair string, start uint32) (trades map[string
 		return
 	}
 
-	if err = json.Unmarshal(r, &trades); err != nil {
-		return
+	if pair == "all" {
+		if err = json.Unmarshal(r, &trades); err != nil {
+			return
+		}
+	} else {
+		var pairTrades []Trade
+		if err = json.Unmarshal(r, &pairTrades); err != nil {
+			return
+		}
+		trades[pair] = pairTrades
 	}
 
 	return
