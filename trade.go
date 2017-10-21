@@ -43,10 +43,10 @@ func (t *Trade) UnmarshalJSON(data []byte) error {
 }
 
 type ResultingTrade struct {
-	Amount  float64 `json:"amount"`
+	Amount  float64 `json:"amount,string"`
 	Date    string  `json:"date"`
-	Rate    float64 `json:"rate"`
-	Total   float64 `json:"total"`
+	Rate    float64 `json:"rate,string"`
+	Total   float64 `json:"total,string"`
 	TradeID string  `json:"tradeID"`
 	Type    string  `json:"type"`
 }
