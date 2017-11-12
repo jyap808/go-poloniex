@@ -218,3 +218,23 @@ func (b *Poloniex) Sell(pair string, rate float64, amount float64, tradeType str
 
 	return orderResponse, nil
 }
+
+func (b *Poloniex) GetOpenOrders(pair string) (openOrders map[string][]OpenOrder, err error) {
+	openOrders = make(map[string][]OpenOrder)
+	r, err := b.client.doCommand("returnOpenOrders", map[string]string{"currencyPair":pair})
+	if err != nil {
+		return
+	}
+	if pair == "all" {
+		if err = json.Unmarshal(r, &openOrders); err != nil {
+			return
+		}
+	} else {
+		var onePairOrders []OpenOrder
+		if err = json.Unmarshal(r, &onePairOrders); err != nil {
+			return
+		}
+		openOrders[pair] = onePairOrders
+	}
+	return
+}
