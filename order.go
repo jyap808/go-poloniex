@@ -19,3 +19,11 @@ type Orderb struct {
 	Quantity float64
 }
 */
+
+type OpenOrder struct {
+	OrderNumber int     `json:"orderNumber,string"`
+	Type        string  `json:"type"`
+	Rate        float64 `json:"rate,string"`
+	Amount      float64 `json:"amount,string"`
+	Total       float64 `json:"total,string"`
+}
