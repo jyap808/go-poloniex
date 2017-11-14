@@ -5,7 +5,7 @@ go-poloniex is an implementation of the Poloniex API (public and private) in Gol
 
 Based off of https://github.com/toorop/go-bittrex/
 
-This library is more of a framework for some bots I use so it is expected that a lot of things don't work but pull requests are excepted.
+This library is more of a framework for some bots I use so it is expected that a lot of things don't work but pull requests are accepted.
 
 ## Import
 	import "github.com/jyap808/go-poloniex"
