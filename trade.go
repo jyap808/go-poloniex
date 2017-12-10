@@ -54,4 +54,5 @@ type ResultingTrade struct {
 type TradeOrder struct {
 	OrderNumber     string           `json:"orderNumber"`
 	ResultingTrades []ResultingTrade `json:"resultingTrades"`
+	ErrorMessage    string           `json:"error"`
 }
