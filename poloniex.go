@@ -197,6 +197,10 @@ func (b *Poloniex) Buy(pair string, rate float64, amount float64, tradeType stri
 		return TradeOrder{}, err
 	}
 
+	if orderResponse.ErrorMessage != "" {
+		return TradeOrder{}, errors.New(orderResponse.ErrorMessage)
+	}
+
 	return orderResponse, nil
 }
 
@@ -214,6 +218,10 @@ func (b *Poloniex) Sell(pair string, rate float64, amount float64, tradeType str
 	var orderResponse TradeOrder
 	if err = json.Unmarshal(r, &orderResponse); err != nil {
 		return TradeOrder{}, err
+	}
+
+	if orderResponse.ErrorMessage != "" {
+		return TradeOrder{}, errors.New(orderResponse.ErrorMessage)
 	}
 
 	return orderResponse, nil
