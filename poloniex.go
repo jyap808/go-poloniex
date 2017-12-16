@@ -246,3 +246,11 @@ func (b *Poloniex) GetOpenOrders(pair string) (openOrders map[string][]OpenOrder
 	}
 	return
 }
+
+func (b *Poloniex) CancelOrder(orderNumber string) error {
+	_, err := b.client.doCommand("cancelOrder", map[string]string{"orderNumber":orderNumber})
+	if err != nil {
+		return err
+	}
+	return nil
+}
