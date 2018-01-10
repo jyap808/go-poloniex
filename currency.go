@@ -1,6 +1,7 @@
 package poloniex
 
 type Currency struct {
+	Id                 int     `json:"id"`
 	Name               string  `json:"name"`
 	MaxDailyWithdrawal string  `json:"maxDailyWithdrawal"`
 	TxFee              float64 `json:"txFee,string"`
