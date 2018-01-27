@@ -101,6 +101,23 @@ func (b *Poloniex) GetOrderBook(market, cat string, depth int) (orderBook OrderB
 	return
 }
 
+// GetOrderTrades is used to get returns all trades involving a given order
+// orderNumber: order number.
+func (b *Poloniex) GetOrderTrades(orderNumber int) (tradeOrderTransaction []TradeOrderTransaction, err error) {
+	r, err := b.client.doCommand("returnOrderTrades", map[string]string{"orderNumber": fmt.Sprintf("%d", orderNumber)})
+	if err != nil {
+		return
+	}
+	if string(r) == `{"error":"Order not found, or you are not the person who placed it."}` {
+		err = fmt.Errorf("Error : order not found, or you are not the person who placed it.")
+		return
+	}
+	if err = json.Unmarshal(r, &tradeOrderTransaction); err != nil {
+		return
+	}
+	return
+}
+
 // Returns candlestick chart data. Required GET parameters are "currencyPair",
 // "period" (candlestick period in seconds; valid values are 300, 900, 1800,
 // 7200, 14400, and 86400), "start", and "end". "Start" and "end" are given in

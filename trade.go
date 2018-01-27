@@ -56,3 +56,15 @@ type TradeOrder struct {
 	ResultingTrades []ResultingTrade `json:"resultingTrades"`
 	ErrorMessage    string           `json:"error"`
 }
+
+type TradeOrderTransaction struct {
+	GlobalTradeID uint64    `json:"globalTradeID"`
+	TradeID       uint64    `json:"tradeID"`
+	CurrencyPair  string    `json:"currencyPair"`
+	Type          string    `json:"type"`
+	Rate          float64   `json:"rate,string"`
+	Amount        float64   `json:"amount,string"`
+	Total         float64   `json:"total,string"`
+	Fee           float64   `json:"fee,string"`
+	Date          time.Time `json:"date,string"`
+}

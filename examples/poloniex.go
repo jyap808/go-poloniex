@@ -20,6 +20,12 @@ func main() {
 		fmt.Println(err, ticker)
 	*/
 
+	// Get Order Trades (3356534544)
+	/*
+		tradeOrderTransaction, err := poloniex.GetOrderTrades(3356534544)
+		fmt.Println("Error:", tradeOrderTransaction)
+	*/
+
 	// Get Tickers
 	/*
 		tickers, err := poloniex.GetTickers()
