@@ -229,7 +229,7 @@ func (b *Poloniex) Sell(pair string, rate float64, amount float64, tradeType str
 
 func (b *Poloniex) GetOpenOrders(pair string) (openOrders map[string][]OpenOrder, err error) {
 	openOrders = make(map[string][]OpenOrder)
-	r, err := b.client.doCommand("returnOpenOrders", map[string]string{"currencyPair":pair})
+	r, err := b.client.doCommand("returnOpenOrders", map[string]string{"currencyPair": pair})
 	if err != nil {
 		return
 	}
@@ -248,9 +248,33 @@ func (b *Poloniex) GetOpenOrders(pair string) (openOrders map[string][]OpenOrder
 }
 
 func (b *Poloniex) CancelOrder(orderNumber string) error {
-	_, err := b.client.doCommand("cancelOrder", map[string]string{"orderNumber":orderNumber})
+	_, err := b.client.doCommand("cancelOrder", map[string]string{"orderNumber": orderNumber})
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// Returns whole lending history chart data. Required GET parameters are "start",
+// "end" (UNIX timestamp format and used to specify the date range for the data returned)
+// and optionally limit (<0 for no limit, poloniex automatically limits to 500 records)
+func (b *Poloniex) LendingHistory(start, end time.Time, limit int) (lendings []Lending, err error) {
+	lendings = make([]Lending, 0)
+	reqParams := map[string]string{
+		"start": strconv.FormatUint(uint64(start.Unix()), 10),
+		"end":   strconv.FormatUint(uint64(end.Unix()), 10)}
+	if limit >= 0 {
+		reqParams["limit"] = string(limit)
+	}
+
+	r, err := b.client.doCommand("returnLendingHistory", reqParams)
+	if err != nil {
+		return
+	}
+
+	if err = json.Unmarshal(r, &lendings); err != nil {
+		return
+	}
+
+	return
 }
