@@ -9,7 +9,7 @@ This library is more of a framework for some bots I use so it is expected that a
 
 ## Import
 	import "github.com/jyap808/go-poloniex"
-	
+
 ## Usage
 ~~~ go
 package main
@@ -32,10 +32,9 @@ func main() {
     tickers, err := poloniex.GetTickers()
 	fmt.Println(err, tickers)
 }
-~~~	
+~~~
 
 See ["Examples" folder for more... examples](https://github.com/jyap808/go-poloniex/blob/master/examples/poloniex.go)
 
 ## Stay tuned
 [Follow me on Twitter](https://twitter.com/jyap)
-
