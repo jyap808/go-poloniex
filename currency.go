@@ -9,6 +9,7 @@ type Currency struct {
 	Disabled           int     `json:"disabled"`
 	Frozen             int     `json:"frozen"`
 	Delisted           int     `json:"delisted"`
+	IsGeofenced        int     `json:"isGeofenced"`
 }
 
 type Currencies struct {
