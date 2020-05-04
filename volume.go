@@ -9,6 +9,7 @@ type Volume map[string]float64
 
 type VolumeCollection struct {
 	TotalBTC  float64 `json:"totalBTC,string"`
+	TotalDAI  float64 `json:"totalDAI,string"`
 	TotalETH  float64 `json:"totalETH,string"`
 	TotalPAX  float64 `json:"totalPAX,string"`
 	TotalTRX  float64 `json:"totalTRX,string"`
@@ -34,6 +35,12 @@ func (tc *VolumeCollection) UnmarshalJSON(b []byte) error {
 				return err
 			}
 			tc.TotalBTC = f
+		case "totalDAI":
+			f, err := parseJSONFloatString(v)
+			if err != nil {
+				return err
+			}
+			tc.TotalDAI = f
 		case "totalETH":
 			f, err := parseJSONFloatString(v)
 			if err != nil {
