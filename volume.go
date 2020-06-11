@@ -8,7 +8,9 @@ import (
 type Volume map[string]float64
 
 type VolumeCollection struct {
+	TotalBNB  float64 `json:"totalBNB,string"`
 	TotalBTC  float64 `json:"totalBTC,string"`
+	TotalBUSD float64 `json:"totalBUSD,string"`
 	TotalDAI  float64 `json:"totalDAI,string"`
 	TotalETH  float64 `json:"totalETH,string"`
 	TotalPAX  float64 `json:"totalPAX,string"`
@@ -29,12 +31,24 @@ func (tc *VolumeCollection) UnmarshalJSON(b []byte) error {
 	tc.Volumes = make(map[string]Volume)
 	for k, v := range m {
 		switch k {
+		case "totalBNB":
+			f, err := parseJSONFloatString(v)
+			if err != nil {
+				return err
+			}
+			tc.TotalBNB = f
 		case "totalBTC":
 			f, err := parseJSONFloatString(v)
 			if err != nil {
 				return err
 			}
 			tc.TotalBTC = f
+		case "totalBUSD":
+			f, err := parseJSONFloatString(v)
+			if err != nil {
+				return err
+			}
+			tc.TotalBUSD = f
 		case "totalDAI":
 			f, err := parseJSONFloatString(v)
 			if err != nil {
